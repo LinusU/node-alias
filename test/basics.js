@@ -1,5 +1,6 @@
 
 var lib = require('../');
+var path = require('path');
 var assert = require('assert');
 
 var rawData = new Buffer(
@@ -51,6 +52,18 @@ describe('encode', function () {
     var buf = lib.encode(info);
 
     assert.deepEqual(rawData, buf);
+
+  });
+});
+
+describe('create', function () {
+  it('should create a simple alias', function () {
+
+    var buf = lib.create(path.join(__dirname, 'basics.js'));
+    var info = lib.decode(buf);
+
+    assert.equal('file', info.target.type);
+    assert.equal('basics.js', info.target.filename);
 
   });
 });
