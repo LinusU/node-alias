@@ -36,6 +36,14 @@ Decodes buffer `buf` and returns an object with info about the alias.
 
 Encodes the `info`-object into an alias, returns a buffer.
 
+## Hacking
+
+Clone the repo and start making changes, run `node-gyp` to build the project.
+
+```sh
+node-gyp rebuild
+```
+
 ## Tests
 
 ```sh
