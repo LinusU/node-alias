@@ -1,5 +1,10 @@
 {
   "name": "macos-alias",
-  "version": "0.2.0",
-  "main": "index.js"
+  "version": "0.2.1",
+  "main": "index.js",
+  "author": "Linus Unnebäck <linus@folkdatorn.se>",
+  "contributors": [
+    "Linus Unnebäck <linus@folkdatorn.se>",
+    "Davide Liessi <davide.liessi@gmail.com>"
+  ]
 }
