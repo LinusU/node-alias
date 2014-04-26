@@ -23,7 +23,7 @@ Local<String> OSErrDescription(OSErr err) {
   return String::New("Could not get volume name");
 }
 
-Handle<Value> MethodGetVolumeName(const Arguments& args) {
+v8::Handle<Value> MethodGetVolumeName(const Arguments& args) {
   HandleScope scope;
 
   String::AsciiValue aPath(args[0]);
