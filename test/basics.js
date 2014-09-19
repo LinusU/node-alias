@@ -1,6 +1,9 @@
 
 var lib = require('../');
+
+var fs = require('fs');
 var path = require('path');
+var temp = require('fs-temp');
 var assert = require('assert');
 
 var rawData = new Buffer(
@@ -66,4 +69,28 @@ describe('create', function () {
     assert.equal('basics.js', info.target.filename);
 
   });
+});
+
+describe('isAlias', function () {
+
+  var aliasFile, garbageFile;
+
+  before(function () {
+    aliasFile = temp.writeFileSync(new Buffer('626f6f6b000000006d61726b00000000', 'hex'));
+    garbageFile = temp.writeFileSync(new Buffer('Hello my name is Linus!'));
+  });
+
+  after(function () {
+    fs.unlinkSync(aliasFile);
+    fs.unlinkSync(garbageFile);
+  });
+
+  it('should identify alias', function () {
+    assert.equal(lib.isAlias(aliasFile), true);
+  });
+
+  it('should identify non-alias', function () {
+    assert.equal(lib.isAlias(garbageFile), false);
+  });
+
 });
