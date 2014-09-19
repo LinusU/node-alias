@@ -36,6 +36,12 @@ Decodes buffer `buf` and returns an object with info about the alias.
 
 Encodes the `info`-object into an alias, returns a buffer.
 
+### alias.isAlias(path)
+
+Check if the file at `path` is an alias, returns a boolean.
+
+(This function performs blocking fs interaction)
+
 ## Hacking
 
 Clone the repo and start making changes, run `node-gyp` to build the project.
