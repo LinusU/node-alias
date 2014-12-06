@@ -2,6 +2,7 @@
   "name": "macos-alias",
   "version": "0.2.2",
   "main": "index.js",
+  "license": "MIT",
   "author": "Linus Unnebäck <linus@folkdatorn.se>",
   "contributors": [
     "Linus Unnebäck <linus@folkdatorn.se>",
@@ -9,5 +10,9 @@
   ],
   "devDependencies": {
     "fs-temp": "^0.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LinusU/node-alias.git"
   }
 }
