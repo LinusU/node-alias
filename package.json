@@ -6,7 +6,8 @@
   "author": "Linus Unnebäck <linus@folkdatorn.se>",
   "contributors": [
     "Linus Unnebäck <linus@folkdatorn.se>",
-    "Davide Liessi <davide.liessi@gmail.com>"
+    "Davide Liessi <davide.liessi@gmail.com>",
+    "Joshua Warner <joshuawarner32@gmail.com>"
   ],
   "devDependencies": {
     "fs-temp": "^0.1.0",
@@ -18,5 +19,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/LinusU/node-alias.git"
+  },
+  "dependencies": {
+    "nan": "^1.4.1"
   }
 }

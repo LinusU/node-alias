@@ -3,30 +3,31 @@
 #include <CoreFoundation/CFURL.h>
 #include <CoreFoundation/CFString.h>
 
-using namespace v8;
+using v8::String;
+using v8::Local;
 
-Local<String> OSErrDescription(OSErr err) {
+const char* OSErrDescription(OSErr err) {
 
   switch (err) {
-    case nsvErr: return String::New("Volume not found");
-    case ioErr: return String::New("I/O error.");
-    case bdNamErr: return String::New("Bad filename or volume name.");
-    case mFulErr: return String::New("Memory full (open) or file won't fit (load)");
-    case tmfoErr: return String::New("Too many files open.");
-    case fnfErr: return String::New("File or directory not found; incomplete pathname.");
-    case volOffLinErr: return String::New("Volume is offline.");
-    case nsDrvErr: return String::New("No such drive.");
-    case dirNFErr: return String::New("Directory not found or incomplete pathname.");
-    case tmwdoErr: return String::New("Too many working directories open.");
+    case nsvErr: return "Volume not found";
+    case ioErr: return "I/O error.";
+    case bdNamErr: return "Bad filename or volume name.";
+    case mFulErr: return "Memory full (open) or file won't fit (load)";
+    case tmfoErr: return "Too many files open.";
+    case fnfErr: return "File or directory not found; incomplete pathname.";
+    case volOffLinErr: return "Volume is offline.";
+    case nsDrvErr: return "No such drive.";
+    case dirNFErr: return "Directory not found or incomplete pathname.";
+    case tmwdoErr: return "Too many working directories open.";
   }
 
-  return String::New("Could not get volume name");
+  return "Could not get volume name";
 }
 
-v8::Handle<Value> MethodGetVolumeName(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MethodGetVolumeName) {
+  NanScope();
 
-  String::AsciiValue aPath(args[0]);
+  NanAsciiString aPath(args[0]);
 
   CFStringRef volumePath = CFStringCreateWithCString(NULL, *aPath, kCFStringEncodingUTF8);
   CFURLRef url = CFURLCreateWithFileSystemPath(NULL, volumePath, kCFURLPOSIXPathStyle, true);
@@ -38,19 +39,19 @@ v8::Handle<Value> MethodGetVolumeName(const Arguments& args) {
   Local<String> errorDesc;
 
   if (CFURLGetFSRef(url, &urlFS) == false) {
-    ThrowException(Exception::Error(String::New("Failed to convert URL to file or directory object"))->ToObject());
-    return scope.Close(Undefined());
+    NanThrowError("Failed to convert URL to file or directory object");
+    NanReturnUndefined();
   }
 
   if ((err = FSGetCatalogInfo(&urlFS, kFSCatInfoVolume, &urlInfo, NULL, NULL, NULL)) != noErr) {
-    ThrowException(Exception::Error(OSErrDescription(err))->ToObject());
-    return scope.Close(Undefined());
+    NanThrowError(OSErrDescription(err));
+    NanReturnUndefined();
   }
 
   if ((err = FSGetVolumeInfo(urlInfo.volume, 0, NULL, kFSVolInfoNone, NULL, &outString, NULL)) != noErr) {
-    ThrowException(Exception::Error(OSErrDescription(err))->ToObject());
-    return scope.Close(Undefined());
+    NanThrowError(OSErrDescription(err));
+    NanReturnUndefined();
   }
 
-  return scope.Close(String::New(outString.unicode, outString.length));
+  NanReturnValue(NanNew(outString.unicode, outString.length));
 }

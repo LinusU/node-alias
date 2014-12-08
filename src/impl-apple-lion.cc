@@ -2,12 +2,15 @@
 #include <CoreFoundation/CFURL.h>
 #include <CoreFoundation/CFString.h>
 
-using namespace v8;
+using v8::String;
+using v8::Exception;
+using v8::Local;
+using v8::Value;
 
 Local<String> MYCFStringGetV8String(CFStringRef aString) {
 
   if (aString == NULL) {
-    return String::New("");
+    return NanNew("");
   }
 
   CFIndex length = CFStringGetLength(aString);
@@ -16,19 +19,19 @@ Local<String> MYCFStringGetV8String(CFStringRef aString) {
 
   if (CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8)) {
 
-    Local<String> result = String::New(buffer);
+    Local<String> result = NanNew(buffer);
     free(buffer);
 
     return result;
   }
 
-  return String::New("");
+  return NanNew("");
 }
 
-Handle<Value> MethodGetVolumeName(const Arguments& args) {
-  HandleScope scope;
+NAN_METHOD(MethodGetVolumeName) {
+   NanScope();
 
-  String::AsciiValue aPath(args[0]);
+  NanAsciiString aPath(args[0]);
 
   CFStringRef out;
   CFErrorRef error;
@@ -40,12 +43,12 @@ Handle<Value> MethodGetVolumeName(const Arguments& args) {
 
     Local<String> result = MYCFStringGetV8String(out);
 
-    return scope.Close(result);
+    NanReturnValue(result);
   } else {
 
     Local<String> desc = MYCFStringGetV8String(CFErrorCopyDescription(error));
-    ThrowException(Exception::Error(desc)->ToObject());
+    NanThrowError(Exception::Error(desc)->ToObject());
 
-    return scope.Close(Undefined());
+    NanReturnUndefined();
   }
 }
