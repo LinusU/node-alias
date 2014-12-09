@@ -25,7 +25,7 @@ describe('decode', function () {
 
     assert.deepEqual(info.volume, {
       name: 'Test Title',
-      created: new Date('2014-01-02T17:20:04.000Z'),
+      created: new Date('2014-01-02T18:20:04.000Z'),
       signature: 'H+',
       type: 'other',
       abspath: '/Volumes/Test Title'
@@ -40,7 +40,7 @@ describe('decode', function () {
       type: 'file',
       filename: 'TestBkg.tiff',
       id: 20,
-      created: new Date('2014-01-02T17:20:08.000Z'),
+      created: new Date('2014-01-02T18:20:08.000Z'),
       path: 'Test Title:.background:',
       abspath: '/.background/TestBkg.tiff'
     });
