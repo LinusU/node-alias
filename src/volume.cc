@@ -1,4 +1,5 @@
 
+#include <nan.h>
 #include <node.h>
 #include <v8.h>
 
@@ -8,8 +9,10 @@
 #error This platform is not implemented yet
 #endif
 
-void init(v8::Handle<v8::Object> exports) {
-  exports->Set(v8::String::NewSymbol("getVolumeName"), v8::FunctionTemplate::New(MethodGetVolumeName)->GetFunction());
+using v8::FunctionTemplate;
+
+void Initialize(v8::Handle<v8::Object> exports) {
+  exports->Set(NanNew("getVolumeName"), NanNew<FunctionTemplate>(MethodGetVolumeName)->GetFunction());
 }
 
-NODE_MODULE(volume, init)
+NODE_MODULE(volume, Initialize)
