@@ -7,7 +7,6 @@ using v8::String;
 using v8::Local;
 
 const char* OSErrDescription(OSErr err) {
-
   switch (err) {
     case nsvErr: return "Volume not found";
     case ioErr: return "I/O error.";

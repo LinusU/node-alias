@@ -8,7 +8,6 @@ using v8::Local;
 using v8::Value;
 
 Local<String> MYCFStringGetV8String(CFStringRef aString) {
-
   if (aString == NULL) {
     return NanNew("");
   }
@@ -17,19 +16,18 @@ Local<String> MYCFStringGetV8String(CFStringRef aString) {
   CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
   char *buffer = (char *) malloc(maxSize);
 
-  if (CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8)) {
-
-    Local<String> result = NanNew(buffer);
-    free(buffer);
-
-    return result;
+  if (!CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8)) {
+    return NanNew("");
   }
 
-  return NanNew("");
+  Local<String> result = NanNew(buffer);
+  free(buffer);
+
+  return result;
 }
 
 NAN_METHOD(MethodGetVolumeName) {
-   NanScope();
+  NanScope();
 
   NanAsciiString aPath(args[0]);
 
@@ -40,14 +38,10 @@ NAN_METHOD(MethodGetVolumeName) {
   CFURLRef url = CFURLCreateWithFileSystemPath(NULL, volumePath, kCFURLPOSIXPathStyle, true);
 
   if(CFURLCopyResourcePropertyForKey(url, kCFURLVolumeNameKey, &out, &error)) {
-
     Local<String> result = MYCFStringGetV8String(out);
-
     NanReturnValue(result);
   } else {
-
     NanThrowError(MYCFStringGetV8String(CFErrorCopyDescription(error)));
-
     NanReturnUndefined();
   }
 }
