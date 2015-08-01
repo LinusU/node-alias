@@ -46,8 +46,7 @@ NAN_METHOD(MethodGetVolumeName) {
     NanReturnValue(result);
   } else {
 
-    Local<String> desc = MYCFStringGetV8String(CFErrorCopyDescription(error));
-    NanThrowError(Exception::Error(desc)->ToObject());
+    NanThrowError(MYCFStringGetV8String(CFErrorCopyDescription(error)));
 
     NanReturnUndefined();
   }

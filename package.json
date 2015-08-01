@@ -21,6 +21,6 @@
     "url": "https://github.com/LinusU/node-alias.git"
   },
   "dependencies": {
-    "nan": "^1.4.1"
+    "nan": "^1.9.0"
   }
 }
