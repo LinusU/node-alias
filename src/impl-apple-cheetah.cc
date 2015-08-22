@@ -3,9 +3,6 @@
 #include <CoreFoundation/CFURL.h>
 #include <CoreFoundation/CFString.h>
 
-using v8::String;
-using v8::Local;
-
 const char* OSErrDescription(OSErr err) {
   switch (err) {
     case nsvErr: return "Volume not found";
@@ -24,9 +21,7 @@ const char* OSErrDescription(OSErr err) {
 }
 
 NAN_METHOD(MethodGetVolumeName) {
-  NanScope();
-
-  NanAsciiString aPath(args[0]);
+  Nan::Utf8String aPath(info[0]);
 
   CFStringRef volumePath = CFStringCreateWithCString(NULL, *aPath, kCFStringEncodingUTF8);
   CFURLRef url = CFURLCreateWithFileSystemPath(NULL, volumePath, kCFURLPOSIXPathStyle, true);
@@ -35,22 +30,18 @@ NAN_METHOD(MethodGetVolumeName) {
   FSRef urlFS;
   FSCatalogInfo urlInfo;
   HFSUniStr255 outString;
-  Local<String> errorDesc;
 
   if (CFURLGetFSRef(url, &urlFS) == false) {
-    NanThrowError("Failed to convert URL to file or directory object");
-    NanReturnUndefined();
+    return Nan::ThrowError("Failed to convert URL to file or directory object");
   }
 
   if ((err = FSGetCatalogInfo(&urlFS, kFSCatInfoVolume, &urlInfo, NULL, NULL, NULL)) != noErr) {
-    NanThrowError(OSErrDescription(err));
-    NanReturnUndefined();
+    return Nan::ThrowError(OSErrDescription(err));
   }
 
   if ((err = FSGetVolumeInfo(urlInfo.volume, 0, NULL, kFSVolInfoNone, NULL, &outString, NULL)) != noErr) {
-    NanThrowError(OSErrDescription(err));
-    NanReturnUndefined();
+    return Nan::ThrowError(OSErrDescription(err));
   }
 
-  NanReturnValue(NanNew(outString.unicode, outString.length));
+  info.GetReturnValue().Set(Nan::New<v8::String>(outString.unicode, outString.length).ToLocalChecked());
 }

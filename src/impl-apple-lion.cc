@@ -9,7 +9,7 @@ using v8::Value;
 
 Local<String> MYCFStringGetV8String(CFStringRef aString) {
   if (aString == NULL) {
-    return NanNew("");
+    return Nan::EmptyString();
   }
 
   CFIndex length = CFStringGetLength(aString);
@@ -17,19 +17,17 @@ Local<String> MYCFStringGetV8String(CFStringRef aString) {
   char *buffer = (char *) malloc(maxSize);
 
   if (!CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8)) {
-    return NanNew("");
+    return Nan::EmptyString();
   }
 
-  Local<String> result = NanNew(buffer);
+  Local<String> result = Nan::New(buffer).ToLocalChecked();
   free(buffer);
 
   return result;
 }
 
 NAN_METHOD(MethodGetVolumeName) {
-  NanScope();
-
-  NanAsciiString aPath(args[0]);
+  Nan::Utf8String aPath(info[0]);
 
   CFStringRef out;
   CFErrorRef error;
@@ -37,11 +35,9 @@ NAN_METHOD(MethodGetVolumeName) {
   CFStringRef volumePath = CFStringCreateWithCString(NULL, *aPath, kCFStringEncodingUTF8);
   CFURLRef url = CFURLCreateWithFileSystemPath(NULL, volumePath, kCFURLPOSIXPathStyle, true);
 
-  if(CFURLCopyResourcePropertyForKey(url, kCFURLVolumeNameKey, &out, &error)) {
-    Local<String> result = MYCFStringGetV8String(out);
-    NanReturnValue(result);
-  } else {
-    NanThrowError(MYCFStringGetV8String(CFErrorCopyDescription(error)));
-    NanReturnUndefined();
+  if(!CFURLCopyResourcePropertyForKey(url, kCFURLVolumeNameKey, &out, &error)) {
+    return Nan::ThrowError(MYCFStringGetV8String(CFErrorCopyDescription(error)));
   }
+
+  info.GetReturnValue().Set(MYCFStringGetV8String(out));
 }

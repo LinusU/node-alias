@@ -11,8 +11,9 @@
 
 using v8::FunctionTemplate;
 
-void Initialize(v8::Handle<v8::Object> exports) {
-  exports->Set(NanNew("getVolumeName"), NanNew<FunctionTemplate>(MethodGetVolumeName)->GetFunction());
+NAN_MODULE_INIT(Initialize) {
+  Nan::Set(target, Nan::New("getVolumeName").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<FunctionTemplate>(MethodGetVolumeName)).ToLocalChecked());
 }
 
 NODE_MODULE(volume, Initialize)
