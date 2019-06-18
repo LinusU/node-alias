@@ -1,15 +1,12 @@
 
+#define NAPI_VERSION 3
+#include <napi.h>
 #include <CoreFoundation/CFURL.h>
 #include <CoreFoundation/CFString.h>
 
-using v8::String;
-using v8::Exception;
-using v8::Local;
-using v8::Value;
-
-Local<String> MYCFStringGetV8String(CFStringRef aString) {
+Napi::String MYCFStringGetV8String(Napi::Env env, CFStringRef aString) {
   if (aString == NULL) {
-    return Nan::EmptyString();
+    return Napi::String::New(env, "");
   }
 
   CFIndex length = CFStringGetLength(aString);
@@ -17,27 +14,28 @@ Local<String> MYCFStringGetV8String(CFStringRef aString) {
   char *buffer = (char *) malloc(maxSize);
 
   if (!CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8)) {
-    return Nan::EmptyString();
+    return Napi::String::New(env, "");
   }
 
-  Local<String> result = Nan::New(buffer).ToLocalChecked();
+  Napi::String result = Napi::String::New(env, buffer);
   free(buffer);
 
   return result;
 }
 
-NAN_METHOD(MethodGetVolumeName) {
-  Nan::Utf8String aPath(info[0]);
+Napi::Value MethodGetVolumeName(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  std::string aPath = info[0].As<Napi::String>();
 
   CFStringRef out;
   CFErrorRef error;
 
-  CFStringRef volumePath = CFStringCreateWithCString(NULL, *aPath, kCFStringEncodingUTF8);
+  CFStringRef volumePath = CFStringCreateWithCString(NULL, aPath.c_str(), kCFStringEncodingUTF8);
   CFURLRef url = CFURLCreateWithFileSystemPath(NULL, volumePath, kCFURLPOSIXPathStyle, true);
 
   if(!CFURLCopyResourcePropertyForKey(url, kCFURLVolumeNameKey, &out, &error)) {
-    return Nan::ThrowError(MYCFStringGetV8String(CFErrorCopyDescription(error)));
+    throw Napi::Error::New(env, MYCFStringGetV8String(env, CFErrorCopyDescription(error)));
   }
 
-  info.GetReturnValue().Set(MYCFStringGetV8String(out));
+  return MYCFStringGetV8String(env, out);
 }
