@@ -1,4 +1,6 @@
 
+#define NAPI_VERSION 3
+#include <napi.h>
 #include <Carbon/Carbon.h>
 #include <CoreFoundation/CFURL.h>
 #include <CoreFoundation/CFString.h>
@@ -20,10 +22,11 @@ const char* OSErrDescription(OSErr err) {
   return "Could not get volume name";
 }
 
-NAN_METHOD(MethodGetVolumeName) {
-  Nan::Utf8String aPath(info[0]);
+Napi::Value MethodGetVolumeName(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  std::string aPath = info[0].As<Napi::String>();
 
-  CFStringRef volumePath = CFStringCreateWithCString(NULL, *aPath, kCFStringEncodingUTF8);
+  CFStringRef volumePath = CFStringCreateWithCString(NULL, aPath.c_str(), kCFStringEncodingUTF8);
   CFURLRef url = CFURLCreateWithFileSystemPath(NULL, volumePath, kCFURLPOSIXPathStyle, true);
 
   OSErr err;
@@ -32,16 +35,16 @@ NAN_METHOD(MethodGetVolumeName) {
   HFSUniStr255 outString;
 
   if (CFURLGetFSRef(url, &urlFS) == false) {
-    return Nan::ThrowError("Failed to convert URL to file or directory object");
+    throw Napi::Error::New(env, "Failed to convert URL to file or directory object");
   }
 
   if ((err = FSGetCatalogInfo(&urlFS, kFSCatInfoVolume, &urlInfo, NULL, NULL, NULL)) != noErr) {
-    return Nan::ThrowError(OSErrDescription(err));
+    throw Napi::Error::New(env, OSErrDescription(err));
   }
 
   if ((err = FSGetVolumeInfo(urlInfo.volume, 0, NULL, kFSVolInfoNone, NULL, &outString, NULL)) != noErr) {
-    return Nan::ThrowError(OSErrDescription(err));
+    throw Napi::Error::New(env, OSErrDescription(err));
   }
 
-  info.GetReturnValue().Set(Nan::New<v8::String>(outString.unicode, outString.length).ToLocalChecked());
+  return Napi::String::New(env, reinterpret_cast<char16_t *>(outString.unicode), outString.length);
 }
